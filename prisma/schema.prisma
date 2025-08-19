@@ -1,0 +1,44 @@
+generator client {
+  provider      = "prisma-client-js"
+  binaryTargets = ["native", "linux-musl-openssl-3.0.x"]
+}
+
+datasource db {
+  provider = "postgresql"
+  url      = env("DATABASE_URL")
+}
+
+model RelacaoAtivos {
+  codBem        String @id
+  descricao     String
+  modeloProd    String
+  fabricaProd   String
+  dataAquisicao String
+  endereco      String
+  local         String
+  valorCompra   String
+  valorResidual String
+  grupo         String
+
+  itensConferidos ItemConferencia[]
+}
+
+model Conferencia {
+  id              String            @id @default(uuid())
+  ambiente        String
+  usuario         String
+  dataConferencia DateTime          @default(now())
+  itensConferidos ItemConferencia[]
+}
+
+model ItemConferencia {
+  id              String  @id @default(uuid())
+  codBem          String
+  localVerificado String
+  pertence        Boolean
+  localReal       String?
+
+  conferenciaId String
+  conferencia   Conferencia   @relation(fields: [conferenciaId], references: [id])
+  ativo         RelacaoAtivos @relation(fields: [codBem], references: [codBem])
+}
