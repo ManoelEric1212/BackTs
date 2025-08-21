@@ -9,7 +9,7 @@ services:
       POSTGRES_PASSWORD: postgres
       POSTGRES_DB: gecom
     ports:
-      - "5432:5432"
+      - "5432:5432" # ❌ se não precisar expor para fora da VPS, pode remover
     volumes:
       - postgres_data:/var/lib/postgresql/data
 
@@ -22,32 +22,8 @@ services:
     environment:
       DATABASE_URL: "postgresql://postgres:postgres@db:5432/gecom"
     command: sh -c "npx prisma migrate deploy && npm start"
-    labels:
-      - "traefik.enable=true"
-      - "traefik.http.routers.api.rule=Host(`vps60873.publiccloud.com.br`)"
-      - "traefik.http.routers.api.entrypoints=websecure"
-      - "traefik.http.routers.api.tls.certresolver=le"
-    networks:
-      - web
-
-  traefik:
-    image: traefik:latest
-    container_name: traefik
-    restart: always
-    command:
-      - "--api.insecure=true"
-      - "--providers.docker=true"
-      - "--entrypoints.web.address=:80"
-      - "--entrypoints.websecure.address=:443"
-      - "--certificatesresolvers.le.acme.tlschallenge=true"
-      - "--certificatesresolvers.le.acme.email=seu-email@dominio.com"
-      - "--certificatesresolvers.le.acme.storage=/letsencrypt/acme.json"
     ports:
-      - "80:80"
-      - "443:443"
-    volumes:
-      - "/var/run/docker.sock:/var/run/docker.sock:ro"
-      - "./letsencrypt:/letsencrypt"
+      - "5000:5000" # ✅ expõe para o Nginx conseguir acessar
     networks:
       - web
 
