@@ -23,12 +23,43 @@ model RelacaoAtivos {
   itensConferidos ItemConferencia[]
 }
 
+model Usuario {
+  id        String   @id @default(uuid())
+  email     String   @unique
+  senha     String
+  nome      String
+  sobrenome String
+  cracha    String   @unique
+  cargo     String
+  foto      String?
+  criadoEm  DateTime @default(now())
+
+  conferenciasCriadas Conferencia[]     @relation("ConferenciasCriadas")
+  participacoes       Participacao[]
+  ItemConferencia     ItemConferencia[]
+}
+
 model Conferencia {
   id              String            @id @default(uuid())
+  titulo          String
   ambiente        String
-  usuario         String
-  dataConferencia DateTime          @default(now())
+  descricao       String?
+  status          StatusConferencia @default(EM_ANDAMENTO)
+  dataCriacao     DateTime          @default(now())
+  dataFinalizacao DateTime?
+  criadorId       String
+  criador         Usuario           @relation("ConferenciasCriadas", fields: [criadorId], references: [id])
+
   itensConferidos ItemConferencia[]
+  participantes   Participacao[]
+}
+
+model Participacao {
+  id            String      @id @default(uuid())
+  usuarioId     String
+  conferenciaId String
+  usuario       Usuario     @relation(fields: [usuarioId], references: [id])
+  conferencia   Conferencia @relation(fields: [conferenciaId], references: [id])
 }
 
 model ItemConferencia {
@@ -38,7 +69,15 @@ model ItemConferencia {
   pertence        Boolean
   localReal       String?
 
+  usuarioId String? // quem conferiu
+  usuario   Usuario? @relation(fields: [usuarioId], references: [id])
+
   conferenciaId String
   conferencia   Conferencia   @relation(fields: [conferenciaId], references: [id])
   ativo         RelacaoAtivos @relation(fields: [codBem], references: [codBem])
+}
+
+enum StatusConferencia {
+  EM_ANDAMENTO
+  FINALIZADA
 }

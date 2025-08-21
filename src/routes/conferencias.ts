@@ -8,51 +8,12 @@ interface ItemVerificado {
   localVerificado: string;
 }
 
-router.post("/", async (req: Request, res: Response) => {
-  const {
-    usuario,
-    ambiente,
-    itens,
-  }: { usuario: string; ambiente: string; itens: ItemVerificado[] } = req.body;
-
+router.post("/", async (req, res) => {
+  const { titulo, ambiente, descricao, criadorId } = req.body;
   const conferencia = await prisma.conferencia.create({
-    data: {
-      usuario,
-      ambiente,
-      itensConferidos: {
-        create: await Promise.all(
-          itens.map(async (item) => {
-            const ativo = await prisma.relacaoAtivos.findUnique({
-              where: { codBem: item.codBem },
-            });
-            if (!ativo) return null;
-
-            const pertence = ativo.local === item.localVerificado;
-            return {
-              codBem: item.codBem,
-              localVerificado: item.localVerificado,
-              pertence,
-              localReal: pertence ? null : ativo.local,
-            };
-          })
-        ).then((itens) => itens.filter(Boolean) as any),
-      },
-    },
-    include: { itensConferidos: true },
+    data: { titulo, ambiente, descricao, criadorId },
   });
-
   res.json(conferencia);
-});
-
-router.get("/:usuario", async (req: Request, res: Response) => {
-  const usuario = req.params.usuario;
-
-  const conferencias = await prisma.conferencia.findMany({
-    where: { usuario },
-    include: { itensConferidos: true },
-  });
-
-  res.json(conferencias);
 });
 
 router.post("/verificar", async (req: Request, res: Response) => {
