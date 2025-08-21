@@ -1,31 +1,41 @@
-db:
-  image: postgres:15
-  restart: always
-  environment:
-    POSTGRES_USER: postgres
-    POSTGRES_PASSWORD: postgres
-    POSTGRES_DB: gecom
-  volumes:
-    - postgres_data:/var/lib/postgresql/data
-  networks:
-    - web
-  healthcheck:
-    test: ["CMD-SHELL", "pg_isready -U postgres -d gecom"]
-    interval: 5s
-    timeout: 5s
-    retries: 5
+version: "3.9"
 
-api:
-  build: .
-  container_name: api_app
-  restart: always
-  depends_on:
-    db:
-      condition: service_healthy
-  environment:
-    DATABASE_URL: "postgresql://postgres:postgres@db:5432/gecom"
-  command: sh -c "npx prisma migrate deploy && npm start"
-  ports:
-    - "5000:5000"
-  networks:
-    - web
+services:
+  db:
+    image: postgres:15
+    restart: always
+    environment:
+      POSTGRES_USER: postgres
+      POSTGRES_PASSWORD: postgres
+      POSTGRES_DB: gecom
+    volumes:
+      - postgres_data:/var/lib/postgresql/data
+    networks:
+      - web
+    healthcheck:
+      test: ["CMD-SHELL", "pg_isready -U postgres -d gecom"]
+      interval: 5s
+      timeout: 5s
+      retries: 5
+
+  api:
+    build: .
+    container_name: api_app
+    restart: always
+    depends_on:
+      db:
+        condition: service_healthy
+    environment:
+      DATABASE_URL: "postgresql://postgres:postgres@db:5432/gecom"
+    command: sh -c "npx prisma migrate deploy && npm start"
+    ports:
+      - "5000:5000"
+    networks:
+      - web
+
+volumes:
+  postgres_data:
+
+networks:
+  web:
+    driver: bridge
