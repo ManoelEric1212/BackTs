@@ -60,6 +60,8 @@ model Participacao {
   conferenciaId String
   usuario       Usuario     @relation(fields: [usuarioId], references: [id])
   conferencia   Conferencia @relation(fields: [conferenciaId], references: [id])
+
+  @@unique([usuarioId, conferenciaId])
 }
 
 model ItemConferencia {
