@@ -60,7 +60,14 @@ router.post("/login", async (req, res) => {
   });
   res.json({
     token,
-    usuario: { id: usuario.id, nome: usuario.nome, email: usuario.email },
+    usuario: {
+      id: usuario.id,
+      nome: usuario.nome,
+      email: usuario.email,
+      cargo: usuario.cargo,
+      matricula: usuario.cracha,
+      foto: usuario.foto,
+    },
   });
 });
 
