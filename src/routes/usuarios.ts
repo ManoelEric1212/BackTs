@@ -11,6 +11,8 @@ router.post("/", async (req, res) => {
 
   const hash = await bcrypt.hash(senha, 10);
 
+  // Validar se existe
+
   try {
     const usuario = await prisma.usuario.create({
       data: { email, senha: hash, nome, sobrenome, cracha, cargo, foto },

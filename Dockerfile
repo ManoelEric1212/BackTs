@@ -28,4 +28,4 @@ COPY --from=build /usr/src/app/node_modules ./node_modules
 
 EXPOSE 5000
 
-CMD ["npm", "run", "start"]
+CMD npx prisma migrate deploy && npm run start

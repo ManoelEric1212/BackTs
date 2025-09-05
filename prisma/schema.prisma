@@ -71,7 +71,7 @@ model ItemConferencia {
   pertence        Boolean
   localReal       String?
 
-  usuarioId String? // quem conferiu
+  usuarioId String?
   usuario   Usuario? @relation(fields: [usuarioId], references: [id])
 
   conferenciaId String
